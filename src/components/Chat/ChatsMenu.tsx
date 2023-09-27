@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import checkToken from '../api/checkToken';
+import checkToken from '../../api/checkToken';
 
 const ChatsMenu = () => {
   const navigate = useNavigate();
