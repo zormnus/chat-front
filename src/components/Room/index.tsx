@@ -1,21 +1,22 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 
-import { IRoom } from '../../../types';
+import { IRoom } from '../../types';
 
 interface RoomProps {
   room: IRoom;
-  onClick?: () => void;
 }
 
-const Room: FC<RoomProps> = ({ room, onClick }) => {
+const Room: FC<RoomProps> = ({ room }) => {
+  const navigate = useNavigate();
+
   return (
     <Grid
+      onClick={() => navigate(`/chat/${room.id}`)}
       item
-      onClick={onClick}
       xs={12}
       sx={{
         height: 50,

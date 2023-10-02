@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Container } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import Room from './Room';
+import Room from '../Room';
 
 import checkToken from '../../api/checkToken';
 import { IRoom } from '../../types';
@@ -21,10 +22,6 @@ const ChatsMenu = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const onRoomClick = (room: IRoom) => {
-    console.log(room);
-  };
-
   React.useEffect(() => {
     const fetchData = async () => {
       const isTokenValid = await checkToken();
@@ -41,11 +38,15 @@ const ChatsMenu = () => {
 
   return (
     <Container maxWidth="md">
-      <Grid container sx={{ gap: '1rem' }}>
-        {rooms.map((room) => (
-          <Room key={room.id} room={room} onClick={() => onRoomClick(room)} />
-        ))}
-      </Grid>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <Grid container sx={{ gap: '1rem' }}>
+          {rooms.map((room) => (
+            <Room key={room.id} room={room} />
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 };
