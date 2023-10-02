@@ -1,18 +1,24 @@
 import React, { FormEvent, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import AuthForm from './AuthForm';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
-import axios from 'axios';
+
 import FormAlert from './FormAlert';
+import AuthForm from './AuthForm';
 
 const SignIn: React.FC = () => {
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const navigate = useNavigate();
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -31,6 +37,8 @@ const SignIn: React.FC = () => {
       localStorage.setItem('refreshToken', refresh);
       setSnackbarMessage('Успешная авторизация');
       setSnackbarOpen(true);
+
+      // navigate('/chats');
     } catch (error) {
       console.error(error);
     }
