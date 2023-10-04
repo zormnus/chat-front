@@ -4,7 +4,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SignIn from './components/Auth/Login';
 import Registration from './components/Auth/Registration';
 import Welcome from './Welcome';
-import ChatsMenu from './components/Chat/ChatsMenu';
+import ChatsMenu from './components/ChatsMenu';
+import Chat from './components/Chat';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
     path: 'chats/',
     element: <ChatsMenu />,
   },
+  { path: '/chat/:chatId', element: <Chat /> },
 ]);
 
 const root = ReactDOM.createRoot(

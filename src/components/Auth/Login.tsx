@@ -39,6 +39,7 @@ const SignIn: React.FC = () => {
       setSnackbarOpen(true);
 
       // navigate('/chats');
+      setTimeout(() => navigate('/chats'), 700);
     } catch (error) {
       console.error(error);
     }
