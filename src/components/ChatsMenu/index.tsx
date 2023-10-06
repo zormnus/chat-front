@@ -20,7 +20,7 @@ const ChatsMenu = () => {
   const [value, setValue] = React.useState('');
 
   const generateRandomString = () => {
-    const i = Math.floor(Math.random() * 10);
+    const i = Math.floor(Math.random() * 10) + 1;
 
     let rnd = '';
     while (rnd.length < i) rnd += Math.random().toString(36).substring(2);
