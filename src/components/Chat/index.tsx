@@ -6,39 +6,58 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+
+import authStore from '../../store';
 
 const Chat = () => {
   const { chatId } = useParams();
 
-  const socket = new WebSocket(`ws://localhost:8000/ws/chat/chat${chatId}/`);
   const navigate = useNavigate();
 
   const [messages, setMessages] = React.useState<string[]>([]);
   const [value, setValue] = React.useState('');
 
+  const ws = React.useRef<WebSocket | null>(null);
+  const scrollBox = React.useRef<HTMLDivElement>(null);
+
+  const getData = () => {
+    if (!ws.current) return;
+
+    ws.current.onmessage = (e) => {
+      const message = e.data;
+
+      setMessages((prev) => [...prev, message]);
+    };
+  };
+
+  React.useLayoutEffect(() => {
+    scrollBox.current?.scrollTo(0, document.body.scrollHeight);
+  }, [messages]);
+
   React.useEffect(() => {
-    socket.onopen = () => {
-      console.log('Соединение установлено');
+    ws.current = new WebSocket(`ws://localhost:8000/ws/chat/chat${chatId}/`);
+    ws.current.onopen = () => console.log('Соединине открыто');
+    ws.current.onclose = () => {
+      console.log('Соеденинеие закрыто');
+      navigate('/chats');
     };
-    socket.onclose = () => {
-      console.log('Соединение закрыто');
-    };
-    socket.onmessage = (data: MessageEvent<string>) => {
-      console.log(data);
-    };
-    socket.onerror = (error) => {
-      console.log(error);
-    };
-  }, []);
+
+    ws.current.onerror = (error) => console.log(error);
+
+    getData();
+  }, [ws]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
   const onMessageEnter = () => {
-    setValue('');
+    if (!ws.current || !value) return;
 
-    socket.send(value);
+    ws.current.send(value);
+
+    setValue('');
   };
 
   return (
@@ -46,29 +65,58 @@ const Chat = () => {
       <CssBaseline />
       <Box
         sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
           height: '100vh',
           backgroundColor: '#edd4fc',
           color: 'white',
         }}
       >
-        <TextField
-          value={value}
-          onChange={onChange}
-          onKeyDown={(e) => {
-            if (e.code === 'Enter') onMessageEnter();
+        <Box
+          ref={scrollBox}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            overflowY: 'auto',
+            gap: '1rem',
+            py: 5,
           }}
-          placeholder="Введите сообщение"
-          sx={{ width: '100%' }}
-        />
-        <Button
-          onClick={onMessageEnter}
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mb: 2 }}
         >
-          Отправить сообщение
-        </Button>
+          {messages.map((msg, index) => (
+            <Box
+              key={index}
+              sx={{
+                color: 'black',
+                mx: 5,
+              }}
+            >
+              <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
+                {authStore.username}
+              </Typography>
+              <Typography component="p">{msg}</Typography>
+            </Box>
+          ))}
+        </Box>
+        <Box>
+          <TextField
+            value={value}
+            onChange={onChange}
+            onKeyDown={(e) => {
+              if (e.code === 'Enter') onMessageEnter();
+            }}
+            placeholder="Введите сообщение"
+            sx={{ width: '100%' }}
+          />
+          <Button
+            onClick={onMessageEnter}
+            type="submit"
+            fullWidth
+            variant="contained"
+          >
+            Отправить сообщение
+          </Button>
+        </Box>
       </Box>
     </Container>
   );

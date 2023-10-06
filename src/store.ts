@@ -7,13 +7,14 @@ import { LoginFields } from './types';
 class AuthStore {
   isAuth = false;
   isAuthInProgress = false;
+  username = '';
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
 
     makePersistable(this, {
       name: 'isAuth',
-      properties: ['isAuth'],
+      properties: ['isAuth', 'username'],
       storage: window.localStorage,
     });
   }
@@ -27,7 +28,11 @@ class AuthStore {
       localStorage.setItem('token', resp.data.access);
       localStorage.setItem('refresh', resp.data.refresh);
 
-      runInAction(() => (this.isAuth = true));
+      runInAction(() => {
+        this.isAuth = true;
+
+        if (headers.username) this.username = headers.username.toString();
+      });
     } catch (err) {
       throw Error('Login and password incorrect');
     } finally {

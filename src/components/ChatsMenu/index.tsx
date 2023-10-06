@@ -1,5 +1,6 @@
-import { Container } from '@mui/material';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 import Room from '../Room';
 
@@ -22,6 +23,9 @@ const ChatsMenu = () => {
           <Room key={room.id} room={room} />
         ))}
       </Grid>
+      <Button sx={{ mt: 5 }} type="submit" fullWidth variant="contained">
+        Создать комнату
+      </Button>
     </Container>
   );
 };
