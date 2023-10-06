@@ -48,10 +48,6 @@ const Chat = () => {
     getData();
   }, [ws]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
-
   const onMessageEnter = () => {
     if (!ws.current || !value) return;
 
@@ -101,7 +97,7 @@ const Chat = () => {
         <Box>
           <TextField
             value={value}
-            onChange={onChange}
+            onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.code === 'Enter') onMessageEnter();
             }}
