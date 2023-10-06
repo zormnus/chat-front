@@ -1,8 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import checkToken from '../../api/checkToken';
-
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,36 +13,23 @@ const Chat = () => {
   const socket = new WebSocket(`ws://localhost:8000/ws/chat/chat${chatId}/`);
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    const getChat = async () => {
-      const isTokenValid = await checkToken();
-
-      if (isTokenValid) {
-        socket.onopen = () => {
-          console.log('Соединение установлено');
-        };
-
-        socket.onclose = () => {
-          console.log('Соединение закрыто');
-        };
-
-        socket.onmessage = (data: MessageEvent<string>) => {
-          console.log(data);
-        };
-
-        socket.onerror = (error) => {
-          console.log(error);
-        };
-      } else {
-        navigate('/auth');
-      }
-    };
-
-    getChat();
-  }, []);
-
   const [messages, setMessages] = React.useState<string[]>([]);
   const [value, setValue] = React.useState('');
+
+  React.useEffect(() => {
+    socket.onopen = () => {
+      console.log('Соединение установлено');
+    };
+    socket.onclose = () => {
+      console.log('Соединение закрыто');
+    };
+    socket.onmessage = (data: MessageEvent<string>) => {
+      console.log(data);
+    };
+    socket.onerror = (error) => {
+      console.log(error);
+    };
+  }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -52,6 +37,8 @@ const Chat = () => {
 
   const onMessageEnter = () => {
     setValue('');
+
+    socket.send(value);
   };
 
   return (
@@ -67,6 +54,9 @@ const Chat = () => {
         <TextField
           value={value}
           onChange={onChange}
+          onKeyDown={(e) => {
+            if (e.code === 'Enter') onMessageEnter();
+          }}
           placeholder="Введите сообщение"
           sx={{ width: '100%' }}
         />

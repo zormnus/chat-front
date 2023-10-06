@@ -1,5 +1,4 @@
 import React, { FormEvent, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 import Container from '@mui/material/Container';
@@ -12,6 +11,7 @@ import TextField from '@mui/material/TextField';
 
 import FormAlert from './FormAlert';
 import AuthForm from './AuthForm';
+import authStore from '../../store';
 
 const SignIn: React.FC = () => {
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
@@ -21,6 +21,7 @@ const SignIn: React.FC = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const data = new FormData(event.currentTarget);
     const headers = {
       username: data.get('login'),
@@ -28,17 +29,11 @@ const SignIn: React.FC = () => {
     };
 
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:8000/user/api/token/',
-        headers,
-      );
-      const { access, refresh } = response.data;
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('refreshToken', refresh);
+      await authStore.login(headers);
+
       setSnackbarMessage('Успешная авторизация');
       setSnackbarOpen(true);
 
-      // navigate('/chats');
       setTimeout(() => navigate('/chats'), 700);
     } catch (error) {
       console.error(error);
