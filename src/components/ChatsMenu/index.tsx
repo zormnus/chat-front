@@ -7,25 +7,29 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import Room from '../Room';
+import Loader from '../Loader';
 
-import { IRoom } from '../../types';
+import { IChat } from '../../types';
+import store from '../../store';
 
 const ChatsMenu = () => {
-  const [rooms, setRooms] = React.useState([]);
+  const [rooms, setRooms] = React.useState<IChat[]>([]);
   const [value, setValue] = React.useState('');
-  const [btnStatus, setBtnStatus] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [loading, setIsLoading] = React.useState(true);
 
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     const { data } = await axios.get('/user/api/rooms');
+  React.useEffect(() => {
+    const fetchData = async () => {
+      await store.getRooms();
 
-  //     setRooms(data);
-  //   };
-
-  //   fetchData();
-  // }, []);
+      setIsLoading(false);
+      setRooms(store.rooms);
+    };
+    fetchData();
+  }, [rooms]);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -37,28 +41,34 @@ const ChatsMenu = () => {
     let rnd = '';
     while (rnd.length < i) rnd += Math.random().toString(36).substring(2);
 
-    setValue(rnd.substring(0, i));
+    setValue(`room${rnd.substring(0, i)}`);
   };
 
   const handleCreateRoom = async (roomName: string) => {
-    setBtnStatus(true);
+    const regex = /^[a-zA-Z0-9]+$/;
 
-    const newRoom = { title: roomName };
-    // const response = await axios.post('/user/api/createRoom', newRoom);
+    if (!value) {
+      setError('Нужно ввести название');
+      return;
+    }
 
-    setBtnStatus(false);
+    if (!regex.test(roomName)) {
+      setError('Уберите русский язык из названия');
+      return;
+    }
 
+    setError('');
+
+    const newRoom = { uuid: roomName };
+    const { data } = await axios.post(
+      'http://localhost:8000/chats/chats_manage/chats/',
+      newRoom,
+    );
+
+    setRooms((prev) => [...prev, data]);
     setValue('');
+    handleClose();
   };
-
-  const testRooms: IRoom[] = [
-    { id: 0, title: 'Комната 1' },
-    { id: 1, title: 'Комната 2' },
-    { id: 2, title: 'Комната 3' },
-    { id: 3, title: 'Комната 4' },
-    { id: 4, title: 'Комната 5' },
-    { id: 5, title: 'Комната 6' },
-  ];
 
   return (
     <Container maxWidth="md">
@@ -76,6 +86,11 @@ const ChatsMenu = () => {
             p: 4,
           }}
         >
+          {!!error && (
+            <Typography component="p" sx={{ mb: 2, color: 'red' }}>
+              {error}
+            </Typography>
+          )}
           <TextField
             sx={{ width: '100%' }}
             placeholder="Введите название комнаты"
@@ -97,17 +112,20 @@ const ChatsMenu = () => {
             type="submit"
             fullWidth
             variant="contained"
-            disabled={btnStatus}
           >
             Создать комнату
           </Button>
         </Box>
       </Modal>
-      <Grid container sx={{ gap: '1rem' }}>
-        {testRooms.map((room) => (
-          <Room key={room.id} room={room} />
-        ))}
-      </Grid>
+      {loading ? (
+        <Loader text="Загрузка комнат..." />
+      ) : (
+        <Grid container sx={{ gap: '1rem' }}>
+          {rooms.map((room) => (
+            <Room key={room.uuid} room={room} />
+          ))}
+        </Grid>
+      )}
       <Button
         onClick={handleOpen}
         sx={{ mt: 5 }}

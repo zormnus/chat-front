@@ -4,21 +4,21 @@ import { observer } from 'mobx-react-lite';
 
 import Loader from './components/Loader';
 
-import authStore from './store';
+import store from './store';
 
 const PrivateRoute = () => {
   React.useEffect(() => {
     const getAccess = async () => {
-      await authStore.checkAuth();
+      await store.checkAuth();
     };
 
     getAccess();
   }, []);
 
-  if (authStore.isAuthInProgress) {
+  if (store.isAuthInProgress) {
     return <Loader text="Проверка авторизации..." />;
   }
-  if (authStore.isAuth) {
+  if (store.isAuth) {
     return <Outlet />;
   } else {
     return <Navigate to="/auth" />;

@@ -1,6 +1,6 @@
-export interface IRoom {
-  id: number;
-  title: string;
+export interface IChat {
+  uuid: string;
+  created_at: string;
 }
 
 export interface LoginFields {

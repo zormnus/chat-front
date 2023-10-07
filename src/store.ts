@@ -1,22 +1,36 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, action } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
+import axios from 'axios';
 
 import AuthService from './api/api.auth';
-import { LoginFields } from './types';
+import { LoginFields, IChat } from './types';
 
-class AuthStore {
+class Store {
   isAuth = false;
   isAuthInProgress = false;
   username = '';
+  rooms: IChat[] = [];
 
   constructor() {
-    makeAutoObservable(this, {}, { autoBind: true });
+    makeAutoObservable(this, { deleteRoom: action }, { autoBind: true });
 
     makePersistable(this, {
       name: 'isAuth',
       properties: ['isAuth', 'username'],
       storage: window.localStorage,
     });
+  }
+
+  deleteRoom(uuid: string) {
+    this.rooms = this.rooms.filter((room) => room.uuid !== uuid);
+  }
+
+  async getRooms() {
+    const { data } = await axios.get<IChat[]>(
+      'http://localhost:8000/chats/chats_manage/chats/',
+    );
+
+    runInAction(() => (this.rooms = data));
   }
 
   async login(headers: LoginFields) {
@@ -85,4 +99,4 @@ class AuthStore {
   }
 }
 
-export default new AuthStore();
+export default new Store();

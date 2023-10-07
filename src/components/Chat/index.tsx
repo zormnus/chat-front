@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 
 import Loader from '../Loader';
 
-import authStore from '../../store';
+import store from '../../store';
 
 const Chat = () => {
   const { chatId } = useParams();
@@ -40,7 +40,7 @@ const Chat = () => {
   }, [messages]);
 
   React.useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:8000/ws/chat/chat${chatId}/`);
+    ws.current = new WebSocket(`ws://localhost:8000/ws/chat/${chatId}/`);
     ws.current.onopen = () => {
       setIsLoadingChat(false);
       console.log('Соединение установлено');
@@ -105,7 +105,7 @@ const Chat = () => {
                 }}
               >
                 <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
-                  {authStore.username}
+                  {store.username}
                 </Typography>
                 <Typography component="p">{msg}</Typography>
               </Box>

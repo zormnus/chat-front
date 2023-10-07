@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 
 import FormAlert from './FormAlert';
 import AuthForm from './AuthForm';
-import authStore from '../../store';
+import store from '../../store';
 
 const SignIn: React.FC = () => {
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
@@ -29,7 +29,7 @@ const SignIn: React.FC = () => {
     };
 
     try {
-      await authStore.login(headers);
+      await store.login(headers);
 
       setSnackbarMessage('Успешная авторизация');
       setSnackbarOpen(true);
