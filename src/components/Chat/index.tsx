@@ -30,7 +30,7 @@ const Chat = () => {
     if (!ws.current) return;
 
     ws.current.onmessage = (e) => {
-      const message = e.data;
+      const message = JSON.parse(e.data);
 
       setMessages((prev) => [...prev, message]);
     };
@@ -54,10 +54,10 @@ const Chat = () => {
       );
 
       setMessages(data.messages);
-      console.log(data.messages);
     };
 
     getMessages();
+
     getData();
   }, [ws]);
 
