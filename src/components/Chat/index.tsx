@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -19,7 +20,6 @@ const Chat = () => {
 
   const [messages, setMessages] = React.useState<string[]>([]);
   const [value, setValue] = React.useState('');
-
   const [loadingChat, setIsLoadingChat] = React.useState(true);
 
   const ws = React.useRef<WebSocket | null>(null);
@@ -36,7 +36,7 @@ const Chat = () => {
   };
 
   React.useLayoutEffect(() => {
-    scrollBox.current?.scrollTo(0, document.body.scrollHeight);
+    scrollBox.current?.scrollTo(0, scrollBox.current.scrollHeight);
   }, [messages]);
 
   React.useEffect(() => {
@@ -49,8 +49,15 @@ const Chat = () => {
       console.log('Соеденинеие закрыто');
       navigate('/chats');
     };
-
     ws.current.onerror = (error) => console.log(error);
+
+    // const fetchData = async () => {
+    //   const { data } = await axios.get(`/user/api/messages/${chatId}`);
+
+    //   setMessages(data);
+    // };
+
+    // fetchData();
 
     getData();
   }, [ws]);

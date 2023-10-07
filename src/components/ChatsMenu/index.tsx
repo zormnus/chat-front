@@ -1,11 +1,11 @@
 import React from 'react';
+import axios from 'axios';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
 import Room from '../Room';
@@ -13,11 +13,23 @@ import Room from '../Room';
 import { IRoom } from '../../types';
 
 const ChatsMenu = () => {
+  const [rooms, setRooms] = React.useState([]);
+  const [value, setValue] = React.useState('');
+  const [btnStatus, setBtnStatus] = React.useState(false);
+
+  // React.useEffect(() => {
+  //   const fetchData = async () => {
+  //     const { data } = await axios.get('/user/api/rooms');
+
+  //     setRooms(data);
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const [value, setValue] = React.useState('');
 
   const generateRandomString = () => {
     const i = Math.floor(Math.random() * 10) + 1;
@@ -28,7 +40,18 @@ const ChatsMenu = () => {
     setValue(rnd.substring(0, i));
   };
 
-  const rooms: IRoom[] = [
+  const handleCreateRoom = async (roomName: string) => {
+    setBtnStatus(true);
+
+    const newRoom = { title: roomName };
+    // const response = await axios.post('/user/api/createRoom', newRoom);
+
+    setBtnStatus(false);
+
+    setValue('');
+  };
+
+  const testRooms: IRoom[] = [
     { id: 0, title: 'Комната 1' },
     { id: 1, title: 'Комната 2' },
     { id: 2, title: 'Комната 3' },
@@ -68,13 +91,20 @@ const ChatsMenu = () => {
           >
             Сгенерировать название
           </Button>
-          <Button sx={{ mt: 1 }} type="submit" fullWidth variant="contained">
+          <Button
+            onClick={() => handleCreateRoom(value)}
+            sx={{ mt: 1 }}
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={btnStatus}
+          >
             Создать комнату
           </Button>
         </Box>
       </Modal>
       <Grid container sx={{ gap: '1rem' }}>
-        {rooms.map((room) => (
+        {testRooms.map((room) => (
           <Room key={room.id} room={room} />
         ))}
       </Grid>
