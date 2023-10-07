@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction, action } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-import axios from 'axios';
+import { instance } from './api/api.config';
 
 import AuthService from './api/api.auth';
 import { LoginFields, IChat } from './types';
@@ -22,11 +22,11 @@ class Store {
   }
 
   async deleteRoom(uuid: string) {
-    const { data } = await axios.get(
+    const { data } = await instance.get(
       `http://localhost:8000/chats/chat/id/${uuid}`,
     );
 
-    await axios.delete(
+    await instance.delete(
       `http://localhost:8000/chats/chats_manage/chats/${data.id}`,
     );
 
@@ -35,7 +35,7 @@ class Store {
 
   async addRoom(uuid: string) {
     const newRoom = { uuid };
-    const { data } = await axios.post(
+    const { data } = await instance.post(
       'http://localhost:8000/chats/chats_manage/chats/',
       newRoom,
     );
@@ -44,7 +44,7 @@ class Store {
   }
 
   async getRooms() {
-    const { data } = await axios.get<IChat[]>(
+    const { data } = await instance.get<IChat[]>(
       'http://localhost:8000/chats/chats_manage/chats/',
     );
 

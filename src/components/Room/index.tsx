@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
