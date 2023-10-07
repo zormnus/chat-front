@@ -19,7 +19,9 @@ const ChatsMenu = () => {
 
   const [value, setValue] = React.useState('');
   const [error, setError] = React.useState('');
+  const [open, setOpen] = React.useState(false);
   const [loading, setIsLoading] = React.useState(true);
+  const [btnDisabled, setBtnDisabled] = React.useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +33,6 @@ const ChatsMenu = () => {
     fetchData();
   }, []);
 
-  const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -58,9 +59,11 @@ const ChatsMenu = () => {
     }
 
     setError('');
+    setBtnDisabled(true);
 
     await store.addRoom(roomName);
 
+    setBtnDisabled(false);
     setValue('');
     handleClose();
   };
@@ -107,6 +110,7 @@ const ChatsMenu = () => {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={btnDisabled}
           >
             Создать комнату
           </Button>

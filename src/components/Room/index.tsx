@@ -21,14 +21,19 @@ const Room: FC<RoomProps> = ({ room }) => {
   const navigate = useNavigate();
 
   const [open, setOpen] = React.useState(false);
+  const [btnDisabled, setBtnDisabled] = React.useState(false);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const roomDate = normalizeDate(new Date(room.created_at));
 
   const handleDeleteRoom = async (uuid: string) => {
+    setBtnDisabled(true);
+
     await store.deleteRoom(uuid);
 
+    setBtnDisabled(false);
     handleClose();
   };
 
@@ -61,6 +66,7 @@ const Room: FC<RoomProps> = ({ room }) => {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={btnDisabled}
           >
             Да
           </Button>
