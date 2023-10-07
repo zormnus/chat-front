@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { instance } from '../../api/api.config';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -12,13 +12,14 @@ import Typography from '@mui/material/Typography';
 import Loader from '../Loader';
 
 import store from '../../store';
+import { ChatMessageResponse, ChatMessage } from '../../types';
 
 const Chat = () => {
   const { chatId } = useParams();
 
   const navigate = useNavigate();
 
-  const [messages, setMessages] = React.useState<string[]>([]);
+  const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [value, setValue] = React.useState('');
   const [loadingChat, setIsLoadingChat] = React.useState(true);
 
@@ -35,10 +36,6 @@ const Chat = () => {
     };
   };
 
-  React.useLayoutEffect(() => {
-    scrollBox.current?.scrollTo(0, scrollBox.current.scrollHeight);
-  }, [messages]);
-
   React.useEffect(() => {
     ws.current = new WebSocket(`ws://localhost:8000/ws/chat/${chatId}/`);
     ws.current.onopen = () => {
@@ -51,21 +48,27 @@ const Chat = () => {
     };
     ws.current.onerror = (error) => console.log(error);
 
-    // const fetchData = async () => {
-    //   const { data } = await axios.get(`/user/api/messages/${chatId}`);
+    const getMessages = async () => {
+      const { data } = await instance.get<ChatMessageResponse>(
+        `/chats/chat_messages/${chatId}`,
+      );
 
-    //   setMessages(data);
-    // };
+      setMessages(data.messages);
+      console.log(data.messages);
+    };
 
-    // fetchData();
-
+    getMessages();
     getData();
   }, [ws]);
+
+  React.useLayoutEffect(() => {
+    scrollBox.current?.scrollTo(0, scrollBox.current.scrollHeight);
+  }, [messages]);
 
   const onMessageEnter = () => {
     if (!ws.current || !value) return;
 
-    ws.current.send(value);
+    ws.current.send(JSON.stringify({ message: value, sender: store.username }));
 
     setValue('');
   };
@@ -107,7 +110,7 @@ const Chat = () => {
                 <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
                   {store.username}
                 </Typography>
-                <Typography component="p">{msg}</Typography>
+                <Typography component="p">{msg.body}</Typography>
               </Box>
             ))}
           </Box>
