@@ -8,7 +8,7 @@ import PrivateRoute from './privateRoute';
 import ChatsMenu from './components/ChatsMenu';
 import Chat from './components/Chat';
 
-const App = observer(() => {
+const App = () => {
   return (
     <Routes>
       <Route index element={<Welcome />} />
@@ -20,6 +20,6 @@ const App = observer(() => {
       </Route>
     </Routes>
   );
-});
+};
 
 export default App;

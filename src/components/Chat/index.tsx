@@ -24,41 +24,42 @@ const Chat = () => {
   const [loadingChat, setIsLoadingChat] = React.useState(true);
 
   const ws = React.useRef<WebSocket | null>(null);
+
   const scrollBox = React.useRef<HTMLDivElement>(null);
 
   const getData = () => {
-    if (!ws.current) return;
+    if (ws.current?.readyState === 1) {
+      ws.current.onmessage = (e) => {
+        const message = JSON.parse(e.data);
 
-    ws.current.onmessage = (e) => {
-      const message = JSON.parse(e.data);
-
-      setMessages((prev) => [...prev, message]);
-    };
+        setMessages((prev) => [...prev, message]);
+      };
+    }
   };
 
   React.useEffect(() => {
     ws.current = new WebSocket(`ws://localhost:8000/ws/chat/${chatId}/`);
     ws.current.onopen = () => {
-      setIsLoadingChat(false);
       console.log('Соединение установлено');
+
+      const getMessages = async () => {
+        const { data } = await instance.get<ChatMessageResponse>(
+          `/chats/chat_messages/${chatId}`,
+        );
+
+        setMessages(data.messages);
+      };
+
+      getMessages();
+      getData();
+
+      setIsLoadingChat(false);
     };
     ws.current.onclose = () => {
       console.log('Соеденинеие закрыто');
       navigate('/chats');
     };
     ws.current.onerror = (error) => console.log(error);
-
-    const getMessages = async () => {
-      const { data } = await instance.get<ChatMessageResponse>(
-        `/chats/chat_messages/${chatId}`,
-      );
-
-      setMessages(data.messages);
-    };
-
-    getMessages();
-
-    getData();
   }, [ws]);
 
   React.useLayoutEffect(() => {
