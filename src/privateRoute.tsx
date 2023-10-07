@@ -2,6 +2,8 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
+import Loader from './components/Loader';
+
 import authStore from './store';
 
 const PrivateRoute = () => {
@@ -14,7 +16,7 @@ const PrivateRoute = () => {
   }, []);
 
   if (authStore.isAuthInProgress) {
-    return <div>Checking auth...</div>;
+    return <Loader text="Проверка авторизации..." />;
   }
   if (authStore.isAuth) {
     return <Outlet />;

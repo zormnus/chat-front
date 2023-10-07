@@ -8,6 +8,8 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import Loader from '../Loader';
+
 import authStore from '../../store';
 
 const Chat = () => {
@@ -17,6 +19,8 @@ const Chat = () => {
 
   const [messages, setMessages] = React.useState<string[]>([]);
   const [value, setValue] = React.useState('');
+
+  const [loadingChat, setIsLoadingChat] = React.useState(true);
 
   const ws = React.useRef<WebSocket | null>(null);
   const scrollBox = React.useRef<HTMLDivElement>(null);
@@ -37,7 +41,10 @@ const Chat = () => {
 
   React.useEffect(() => {
     ws.current = new WebSocket(`ws://localhost:8000/ws/chat/chat${chatId}/`);
-    ws.current.onopen = () => console.log('Соединине открыто');
+    ws.current.onopen = () => {
+      setIsLoadingChat(false);
+      console.log('Соединение установлено');
+    };
     ws.current.onclose = () => {
       console.log('Соеденинеие закрыто');
       navigate('/chats');
@@ -59,61 +66,65 @@ const Chat = () => {
   return (
     <Container maxWidth="md">
       <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          height: '100vh',
-          backgroundColor: '#edd4fc',
-          color: 'white',
-        }}
-      >
+      {loadingChat ? (
+        <Loader text="Загрузка..." />
+      ) : (
         <Box
-          ref={scrollBox}
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            overflowY: 'auto',
-            gap: '1rem',
-            py: 5,
+            justifyContent: 'flex-end',
+            height: '100vh',
+            backgroundColor: '#edd4fc',
+            color: 'white',
           }}
         >
-          {messages.map((msg, index) => (
-            <Box
-              key={index}
-              sx={{
-                color: 'black',
-                mx: 5,
-              }}
-            >
-              <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
-                {authStore.username}
-              </Typography>
-              <Typography component="p">{msg}</Typography>
-            </Box>
-          ))}
-        </Box>
-        <Box>
-          <TextField
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.code === 'Enter') onMessageEnter();
+          <Box
+            ref={scrollBox}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              overflowY: 'auto',
+              gap: '1rem',
+              py: 5,
             }}
-            placeholder="Введите сообщение"
-            sx={{ width: '100%' }}
-          />
-          <Button
-            onClick={onMessageEnter}
-            type="submit"
-            fullWidth
-            variant="contained"
           >
-            Отправить сообщение
-          </Button>
+            {messages.map((msg, index) => (
+              <Box
+                key={index}
+                sx={{
+                  color: 'black',
+                  mx: 5,
+                }}
+              >
+                <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
+                  {authStore.username}
+                </Typography>
+                <Typography component="p">{msg}</Typography>
+              </Box>
+            ))}
+          </Box>
+          <Box>
+            <TextField
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.code === 'Enter') onMessageEnter();
+              }}
+              placeholder="Введите сообщение"
+              sx={{ width: '100%' }}
+            />
+            <Button
+              onClick={onMessageEnter}
+              type="submit"
+              fullWidth
+              variant="contained"
+            >
+              Отправить сообщение
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      )}
     </Container>
   );
 };
