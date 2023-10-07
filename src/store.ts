@@ -22,31 +22,24 @@ class Store {
   }
 
   async deleteRoom(uuid: string) {
-    const { data } = await instance.get(
-      `http://localhost:8000/chats/chat/id/${uuid}`,
-    );
+    const { data } = await instance.get(`chats/chat/id/${uuid}`);
 
-    await instance.delete(
-      `http://localhost:8000/chats/chats_manage/chats/${data.id}`,
-    );
+    await instance.delete(`chats/chats_manage/chats/${data.id}`);
 
-    runInAction(() => this.rooms.filter((room) => room.uuid !== uuid));
+    runInAction(() => {
+      this.rooms = this.rooms.filter((room) => room.uuid !== uuid);
+    });
   }
 
   async addRoom(uuid: string) {
     const newRoom = { uuid };
-    const { data } = await instance.post(
-      'http://localhost:8000/chats/chats_manage/chats/',
-      newRoom,
-    );
+    const { data } = await instance.post('chats/chats_manage/chats/', newRoom);
 
     runInAction(() => this.rooms.push(data));
   }
 
   async getRooms() {
-    const { data } = await instance.get<IChat[]>(
-      'http://localhost:8000/chats/chats_manage/chats/',
-    );
+    const { data } = await instance.get<IChat[]>('chats/chats_manage/chats/');
 
     runInAction(() => (this.rooms = data));
   }

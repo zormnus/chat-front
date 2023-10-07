@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -8,6 +7,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { observer } from 'mobx-react-lite';
 
 import Room from '../Room';
 import Loader from '../Loader';
@@ -134,4 +134,4 @@ const ChatsMenu = () => {
   );
 };
 
-export default ChatsMenu;
+export default observer(ChatsMenu);
