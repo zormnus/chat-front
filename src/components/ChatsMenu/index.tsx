@@ -12,11 +12,11 @@ import Typography from '@mui/material/Typography';
 import Room from '../Room';
 import Loader from '../Loader';
 
-import { IChat } from '../../types';
 import store from '../../store';
 
 const ChatsMenu = () => {
-  const [rooms, setRooms] = React.useState<IChat[]>([]);
+  const rooms = store.rooms;
+
   const [value, setValue] = React.useState('');
   const [error, setError] = React.useState('');
   const [loading, setIsLoading] = React.useState(true);
@@ -26,10 +26,10 @@ const ChatsMenu = () => {
       await store.getRooms();
 
       setIsLoading(false);
-      setRooms(store.rooms);
     };
+
     fetchData();
-  }, [rooms]);
+  }, []);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -59,13 +59,8 @@ const ChatsMenu = () => {
 
     setError('');
 
-    const newRoom = { uuid: roomName };
-    const { data } = await axios.post(
-      'http://localhost:8000/chats/chats_manage/chats/',
-      newRoom,
-    );
+    await store.addRoom(roomName);
 
-    setRooms((prev) => [...prev, data]);
     setValue('');
     handleClose();
   };

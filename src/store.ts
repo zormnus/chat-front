@@ -12,7 +12,7 @@ class Store {
   rooms: IChat[] = [];
 
   constructor() {
-    makeAutoObservable(this, { deleteRoom: action }, { autoBind: true });
+    makeAutoObservable(this);
 
     makePersistable(this, {
       name: 'isAuth',
@@ -21,8 +21,26 @@ class Store {
     });
   }
 
-  deleteRoom(uuid: string) {
-    this.rooms = this.rooms.filter((room) => room.uuid !== uuid);
+  async deleteRoom(uuid: string) {
+    const { data } = await axios.get(
+      `http://localhost:8000/chats/chat/id/${uuid}`,
+    );
+
+    await axios.delete(
+      `http://localhost:8000/chats/chats_manage/chats/${data.id}`,
+    );
+
+    runInAction(() => this.rooms.filter((room) => room.uuid !== uuid));
+  }
+
+  async addRoom(uuid: string) {
+    const newRoom = { uuid };
+    const { data } = await axios.post(
+      'http://localhost:8000/chats/chats_manage/chats/',
+      newRoom,
+    );
+
+    runInAction(() => this.rooms.push(data));
   }
 
   async getRooms() {

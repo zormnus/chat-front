@@ -28,15 +28,7 @@ const Room: FC<RoomProps> = ({ room }) => {
   const roomDate = normalizeDate(new Date(room.created_at));
 
   const handleDeleteRoom = async (uuid: string) => {
-    const { data } = await axios.get(
-      `http://localhost:8000/chats/chat/id/${uuid}`,
-    );
-
-    await axios.delete(
-      `http://localhost:8000/chats/chats_manage/chats/${data.id}`,
-    );
-
-    store.deleteRoom(uuid);
+    await store.deleteRoom(uuid);
 
     handleClose();
   };
