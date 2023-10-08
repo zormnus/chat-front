@@ -28,7 +28,7 @@ const Chat = () => {
   const scrollBox = React.useRef<HTMLDivElement>(null);
 
   const getData = () => {
-    if (ws.current?.readyState === 1) {
+    if (ws.current) {
       ws.current.onmessage = (e) => {
         const message = JSON.parse(e.data);
 
@@ -60,6 +60,12 @@ const Chat = () => {
       navigate('/chats');
     };
     ws.current.onerror = (error) => console.log(error);
+
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
   }, [ws]);
 
   React.useLayoutEffect(() => {
@@ -106,10 +112,19 @@ const Chat = () => {
                 sx={{
                   color: 'black',
                   mx: 5,
+                  textAlign:
+                    msg.created_by__username === store.username
+                      ? 'right'
+                      : 'left',
                 }}
               >
-                <Typography sx={{ fontSize: '1.5rem', color: 'primary.light' }}>
-                  {store.username}
+                <Typography
+                  sx={{
+                    fontSize: '1.5rem',
+                    color: 'primary.light',
+                  }}
+                >
+                  {msg.created_by__username}
                 </Typography>
                 <Typography component="p">{msg.body}</Typography>
               </Box>
